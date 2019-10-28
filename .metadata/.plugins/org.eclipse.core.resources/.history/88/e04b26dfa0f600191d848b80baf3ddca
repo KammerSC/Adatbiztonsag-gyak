@@ -1,0 +1,138 @@
+package david.borbely.mymath;
+
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
+import static java.math.BigInteger.ZERO;
+import static java.math.BigInteger.ONE;
+import static java.math.BigInteger.TWO;
+
+public class MyMath {
+	private static BigInteger MINUS_ONE = new BigInteger("-1");
+	private static Random RANDOM = new Random();
+	
+	public static BigInteger randomBigInteger(int maxBitLength) {
+		return new BigInteger(maxBitLength, RANDOM);
+	}
+
+	public static boolean isItPrime(BigInteger canditate) {
+		boolean result = false;
+		if (isItPositive(canditate) && isItOdd(canditate)) {
+			MillerRabinTestObject tmp = new MillerRabinTestObject(canditate);
+			result = tmp.isPRime();
+		}
+		return result;
+	}
+
+	private static boolean isItPositive(BigInteger canditate) {
+		return canditate.signum() == 1;
+	}
+
+	public static boolean isItOdd(BigInteger canditate) {
+		return canditate.getLowestSetBit() == 0;
+	}
+
+	public static BigInteger fastModularExponentiation(BigInteger base, BigInteger power, BigInteger modulo) {
+		List<BasePowerReminder> fastPowerList = generateFastPowerList(base, power, modulo);
+		List<BasePowerReminder> relevantFastPowerList = getRelevantFastPowerList(power, fastPowerList);
+		return getResult(modulo, relevantFastPowerList);
+	}
+
+	private static BigInteger getResult(BigInteger modulo, List<BasePowerReminder> relevantFastPowerList) {
+		BigInteger result = relevantFastPowerList.get(0).reminder;
+		if (relevantFastPowerList.size() > 1) {
+			for (int i = 1; i < relevantFastPowerList.size(); i++) {
+				result = result.multiply(relevantFastPowerList.get(i).reminder).remainder(modulo);
+			}
+		}
+		return result;
+	}
+
+	private static List<BasePowerReminder> getRelevantFastPowerList(BigInteger power, List<BasePowerReminder> fastPowerList) {
+		List<BasePowerReminder> relevantFastPowerList = new ArrayList<BasePowerReminder>();
+		BigInteger pow = power;
+		for (int i = fastPowerList.size() - 1; i >= 0; i--) {
+			BasePowerReminder element = fastPowerList.get(i);
+			if (isGreaterEqual(pow, element.power)) {
+				pow = pow.subtract(element.power);
+				relevantFastPowerList.add(element);
+			}
+		}
+		return relevantFastPowerList;
+	}
+	
+	private static boolean isGreaterEqual(BigInteger a, BigInteger b) {
+		int compare = a.compareTo(b);
+		return compare != -1;
+	}
+
+	private static List<BasePowerReminder> generateFastPowerList(BigInteger base, BigInteger power, BigInteger modulo) {
+		List<BasePowerReminder> list = new ArrayList<BasePowerReminder>();
+		BasePowerReminder zeroElement = new BasePowerReminder(base, ONE, modulo);
+		list.add(zeroElement);
+		BigInteger pow = TWO;
+		for (int i = 0; isLess(pow, power); i++, pow = pow.multiply(TWO)) {
+			BigInteger lastReminder = list.get(i).reminder;
+			BigInteger newBase = lastReminder.multiply(lastReminder);
+			BasePowerReminder element = new BasePowerReminder(newBase, pow, modulo);
+			list.add(element);
+		}
+		return list;
+	}
+
+	public static BigInteger[] extendedEuclideanAlgorithm(BigInteger a, BigInteger b) {
+		BigInteger first = new BigInteger(a.toString());
+		BigInteger secund = new BigInteger(b.toString());
+		List<BigInteger> quotientlist = new ArrayList<BigInteger>();
+		BigInteger[] result = new BigInteger[3];
+		result[0] = getGreatestCommonDivederWithQuotients(first, secund, quotientlist);
+		result[1] = getRowWithQuotientList(ONE, ZERO, quotientlist);
+		result[1] = getSignum(result[1], quotientlist.size());
+		result[2] = getRowWithQuotientList(ZERO, ONE, quotientlist);
+		result[2] = getSignum(result[2], quotientlist.size() + 1);
+		System.out.println("eucl: " + result[0] + ", " + result[1] + ", " + result[2]);
+		return result;
+	}
+	
+
+
+	private static BigInteger getRowWithQuotientList(BigInteger a, BigInteger b, List<BigInteger> quotientlist) {
+		for (BigInteger q : quotientlist) {
+			BigInteger tmp = b;
+			b = a.add(b.multiply(q));
+			a = tmp;
+		}
+		return a;
+	}
+
+	private static BigInteger getGreatestCommonDivederWithQuotients(BigInteger first, BigInteger secund,
+			List<BigInteger> quotientlist) {
+		while (!isEqual(secund, ZERO)) {
+			BigInteger quotient = first.divide(secund);
+			BigInteger tmp = first;
+			first = secund;
+			secund = tmp.remainder(first);
+			quotientlist.add(quotient);
+		}
+		return first;
+	}
+
+	private static BigInteger getSignum(BigInteger a, int index) {
+		int sig = index % 2;
+		return sig == 0 ? a.multiply(ONE) : a.multiply(MINUS_ONE);
+	}
+
+	public static boolean isMore(BigInteger a, BigInteger b) {
+		return a.compareTo(b) == 1;
+	}
+
+	public static boolean isEqual(BigInteger a, BigInteger b) {
+		return a.compareTo(b) == 0;
+	}
+
+	public static boolean isLess(BigInteger a, BigInteger b) {
+		return a.compareTo(b) == -1;
+	}
+}

@@ -1,0 +1,8 @@
+1571258930873	Delete element
+1571306183603	Rename type 'myMath'
+1571332429012	Delete element
+1571347067862	Extract method 'doMillerRabinTests'
+1571349859324	Extract method 'generateFastPowerList'
+1571351370301	Extract method 'getRelevantFastPowerList'
+1571351854760	Extract method 'getResult'
+1571398594380	Rename local variable 'bitLength'

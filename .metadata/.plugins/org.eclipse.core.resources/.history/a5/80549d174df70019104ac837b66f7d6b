@@ -1,0 +1,76 @@
+package david.borbely.view;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.InputStream;
+import java.math.BigInteger;
+import java.util.Scanner;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
+
+import david.borbely.mymath.MyMath;
+import david.borbely.rsa.RSA;
+
+public class View{
+	
+	private InputStream input;
+	private RSA rsa;
+	private Scanner scanner;
+
+	public View(InputStream input, RSA rsa) {
+		this.input = input;
+		this.rsa = rsa;
+		scanner = new Scanner(input);
+	}
+	
+	public void start() {
+		askHowToGetPrimes();
+		String answer = getAnswer();
+		generatePrimeBasedOnAnswer(answer);
+		boolean continueLoop = true;
+		while(continueLoop) {
+			askForTask();
+			
+		}
+	}
+
+
+
+
+
+
+	private void askHowToGetPrimes() {
+		System.out.println("Would you like to define the used primes?\n(Type \"yes\" and then give the primes is separete lines, every other answer means no)");		
+	}
+	
+	private String getAnswer() {
+		return scanner.nextLine().trim();
+	}
+	
+	private void generatePrimeBasedOnAnswer(String answer) {
+		if(answer.equalsIgnoreCase("YES")) {
+			System.out.println("First prime:");
+			BigInteger a = scanner.nextBigInteger();
+			System.out.println("Second prime:");
+			BigInteger b = scanner.nextBigInteger();
+			rsa.getKeyFromInput(a, b);
+		}
+		else {
+			rsa.generatePrimes();
+		}
+		
+		rsa.printPrimes();
+		rsa.printKeys();
+	}
+	
+	private void askForTask() {
+		System.out.println("Would you like to Encrypt or Decrypt?\n(Type \"decrypt\" then the number in the next line,\ntype \"encrypt\" then the number in the next line,\n every other answer means quit)");
+		
+	}
+
+}

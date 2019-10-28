@@ -1,0 +1,120 @@
+package david.borbely.rsa;
+
+import java.io.InputStream;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.Random;
+import java.util.Scanner;
+
+import static david.borbely.mymath.MyMath.randomBigInteger;
+import static david.borbely.mymath.MyMath.isItPrime;
+import static david.borbely.mymath.MyMath.extendedEuclideanAlgorithm;
+import static david.borbely.mymath.MyMath.fastModularExponentiation;
+import static david.borbely.mymath.MyMath.isEqual;
+import static david.borbely.mymath.MyMath.isMore;
+import static david.borbely.mymath.MyMath.isLess;
+
+import static java.math.BigInteger.ONE;
+import static java.math.BigInteger.TWO;
+
+public class RSA {
+
+	private final int minBitLength;
+	private final int maxBitLength;
+
+	private BigInteger primP;
+	private BigInteger primQ;
+	private BigInteger n;
+	private BigInteger fiN;
+	private BigInteger e = BigInteger.ONE;
+	private BigInteger d;
+	private BigInteger[] euc; 
+
+	public RSA(int bitLength) {
+		this.minBitLength = (bitLength > 32) ? (int)(bitLength* 0.9) : 32;
+		this.maxBitLength = (bitLength > 32) ? (int)(bitLength* 1.1) : 64;
+	}
+
+	public void getKeyFromInput(InputStream in) {
+		Scanner scanner = new Scanner(in);
+		primP = scanner.nextBigInteger();
+		primQ = scanner.nextBigInteger();
+		setNumbers();
+	};
+
+	private BigInteger getValidPrimeFromInput(Scanner scanner) {
+		BigInteger value = new BigInteger(scanner.nextLine().trim());
+		if (!isItPrime(value)) {
+			System.out.println("Invalid value: " + value + " is not prime");
+			value = generatePrime(maxBitLength);
+		}
+		return value;
+	}
+
+	public void generatePrimes() {
+		primP = generatePrime(minBitLength);
+		primQ = generatePrime(maxBitLength);
+		while(primP.compareTo(primQ) == 0) {
+			primQ = generatePrime(maxBitLength);
+		}
+		setNumbers();
+	}
+
+	private BigInteger generatePrime(int bitLength) {
+		BigInteger prime = randomBigInteger(bitLength);
+		while (!isItPrime(prime)) {
+			prime = randomBigInteger(bitLength);
+			prime.setBit(prime.bitLength()-1);
+		}
+		return prime;
+	}
+
+	private void setNumbers() {
+		setNandFiN();
+		setEandD();
+	}
+	
+	private void setNandFiN() {
+		n = primP.multiply(primQ);
+		fiN = primP.subtract(ONE).multiply(primQ.subtract(ONE));
+	}
+
+	private void setEandD() {
+		do{
+			e = e.add(ONE);
+			euc = extendedEuclideanAlgorithm(e, fiN);
+		}while(!isEqual(euc[0], ONE));
+		d = euc[1];
+		if(isLess(d, ONE)) {
+			d = d.add(fiN);
+		}
+		
+	}
+	
+	public void printKeys() {
+		System.out.println("p = " + primP + ", bitlength: " + primP.bitLength());
+		System.out.println("q = " + primQ + ", bitlength: " + primQ.bitLength());
+	};
+
+	public BigInteger encryptMessage(int message) {
+		return fastModularExponentiation(BigInteger.valueOf(message), e, n);
+	};
+
+	public int decryptMessage(BigInteger encryptedMessage) {
+		BigInteger power = fastModularExponentiation(d, ONE, primP.subtract(ONE));
+		BigInteger mp = fastModularExponentiation(encryptedMessage, power, primP);
+		power = fastModularExponentiation(d, ONE, primQ.subtract(ONE));
+		BigInteger mq = fastModularExponentiation(encryptedMessage, power, primQ);
+		
+		
+		BigInteger result1 = mp.multiply(euc[2]).multiply(primQ);
+		System.out.println("result1: " + result1 + "--- mp: " + mp  + ", Yq: " + euc[2] + ", q:" + primQ);
+		
+		
+		BigInteger result2 = mq.multiply(euc[1]).multiply(primP);
+		System.out.println("result2: " + result2 + "--- mq: " + mq  + ", Yp: " + euc[1] + ", p:" + primP);
+		
+		return result1.add(result2).intValue();
+	};
+
+}

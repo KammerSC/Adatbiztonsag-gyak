@@ -1,0 +1,32 @@
+package david.borbely.view;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.InputStream;
+import java.math.BigInteger;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
+
+import david.borbely.mymath.MyMath;
+import david.borbely.rsa.RSA;
+
+public class View{
+	
+	private InputStream input;
+
+	public View(InputStream input) {
+		this.input = input;
+	}
+	
+	public void start() {
+		
+	}
+	
+	
+
+}

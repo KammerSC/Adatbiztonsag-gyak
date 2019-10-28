@@ -1,0 +1,148 @@
+package david.borbely.mymath;
+
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Random;
+
+import static david.borbely.mymath.MyMath.isEqual;
+import static david.borbely.mymath.MyMath.isItOdd;
+import static david.borbely.mymath.MyMath.isGreater;
+import static david.borbely.mymath.MyMath.fastModularExponentiation;
+
+public class MillerRabinTestObject {
+	private static final BigInteger ZERO = BigInteger.ZERO;
+	private static final BigInteger ONE = BigInteger.ONE;
+	private static final BigInteger TWO = BigInteger.TWO;
+	private static final BigInteger THREE = new BigInteger("3");
+	private static final BigInteger FOUR = new BigInteger("4");
+	private static final int DEFAULT_TEST_TIMES = 100;
+
+	
+	private final BigInteger number;
+	private int powerOfTwo;
+	private BigInteger multiplier;
+	private int testTimes;
+	List<BigInteger> probedBases = new ArrayList<BigInteger>();
+	private final BigInteger MINUS_ONE;
+
+	private Random random = new Random();
+
+	public MillerRabinTestObject(BigInteger number) {
+		this.number = number;
+		MINUS_ONE = number.subtract(ONE);
+	}
+
+	public boolean isPRime() {
+		boolean prime = false;
+		if (isGreater(number, THREE) && isItOdd(number)) {
+			prime = false;
+			findTwoPowerFrom();
+			System.out.println(this);
+			calculateTestTimes();
+//			System.out.println("TestTimes: " + testTimes);
+			for (int i = 0; i < testTimes; i++) {
+				if(doMillerRAbinTest()) {
+					prime = true;
+				}
+					
+			}
+			System.out.println(probedBases + "\n-----------------");
+		}
+		return prime;
+	}
+
+	private void findTwoPowerFrom() {
+		BigInteger num = number.subtract(BigInteger.ONE);
+		powerOfTwo = 0;
+		while (!isItOdd(num)) {
+			num = num.divide(TWO);
+			powerOfTwo++;
+		}
+		multiplier = num;
+	}
+
+	private void calculateTestTimes() {
+//		System.out.println(number + " Can be prime...");
+		int bitLength = number.bitLength();
+		if (bitLength < 24) {
+			testTimes = calculateSmallNumberTestTime();
+		} else {
+			testTimes = calculateBigNumberTestTime();
+		}
+	}
+
+	private int calculateSmallNumberTestTime() {
+		int maxBases = number.intValue() - 4;
+		return maxBases < 100 ? maxBases : 100;
+	}
+
+	private int calculateBigNumberTestTime() {
+		int bitLength = number.bitLength();
+		int times;
+		if (bitLength > 1024) {
+			times = 3;
+		} else if (bitLength > 756) {
+			times = 5;
+		} else if (bitLength > 512) {
+			times = 9;
+		} else if (bitLength > 256) {
+			times = 18;
+		} else if (bitLength > 128) {
+			times = 27;
+		} else if (bitLength > 64) {
+			times = 36;
+		} else if (bitLength > 32) {
+			times = 50;
+		} else {
+			times = 80;
+		}
+		return times;
+	}
+
+	private boolean doMillerRAbinTest() {
+		boolean prime = false;
+		BigInteger base = getRandomUnusedBase();
+		probedBases.add(base);
+		System.out.println("-------\nResults:");
+		BigInteger result = fastModularExponentiation(base, multiplier, number);
+		System.out.println("result: " + result + ", base: " + base);
+		if(isEqual(result, ONE) || isEqual(result, MINUS_ONE)) {
+			prime = true;
+		}else {
+			for(int i=1; i<powerOfTwo; i++) {
+				result = result.multiply(result).mod(number);
+				System.out.println("-->result: " + result);
+				if(isEqual(result, MINUS_ONE)) {
+					prime = true;
+					break;
+				}
+				if(isEqual(result, ONE)) {
+					prime = false;
+					break;
+				}
+			}
+			
+		}
+		System.out.println("-------");
+		return prime;
+	}
+
+	private BigInteger getRandomUnusedBase() {
+		BigInteger upperlimit = number.subtract(FOUR);
+		BigInteger canditate;
+		do {
+			canditate = new BigInteger(upperlimit.bitLength(), random);
+			canditate = canditate.mod(upperlimit).add(TWO);
+		}while(probedBases.contains(canditate));
+		return canditate;
+	}
+
+	@Override
+	public String toString() {
+		return "MillerRabinTestObject [number=" + number + ", rounds=" + powerOfTwo + ", multiplier=" + multiplier
+				+ "]";
+	}
+
+}

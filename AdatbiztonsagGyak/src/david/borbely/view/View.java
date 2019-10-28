@@ -1,0 +1,120 @@
+package david.borbely.view;
+
+import java.io.InputStream;
+import java.math.BigInteger;
+import java.util.Scanner;
+
+import david.borbely.mymath.MyMath;
+import david.borbely.rsa.RSA;
+
+public class View {
+
+	private RSA rsa;
+	private Scanner scanner;
+
+	public View(InputStream input, RSA rsa) {
+		this.rsa = rsa;
+		scanner = new Scanner(input);
+	}
+
+	public void start() {
+		askHowToGetPrimes();
+		String answer = getAnswer();
+		generatePrimeBasedOnAnswer(answer);
+		boolean continueLoop = true;
+		while (continueLoop) {
+			askForTask();
+			answer = getAnswer();
+			if (answer.equalsIgnoreCase("decrypt")) {
+				decryptMessage();
+			} else if (answer.equalsIgnoreCase("encrypt")) {
+				encryptMessage();
+			} else {
+				System.out.println("Quit selected!");
+				continueLoop = false;
+			}
+			System.out.println("-------------------------------------");
+		}
+	}
+
+	private void askHowToGetPrimes() {
+		System.out.println("Would you like to define the used primes?\n"
+				+ "(Type \"yes\" and then give the primes is separete lines, every other answer means no)");
+	}
+
+	private String getAnswer() {
+		return scanner.nextLine().trim();
+	}
+
+	private void generatePrimeBasedOnAnswer(String answer) {
+		if (answer.equalsIgnoreCase("YES")) {
+			System.out.println("First prime:");
+			BigInteger a = readAsBigIntiger();
+			System.out.println("Second prime:");
+			BigInteger b = readAsBigIntiger();
+			rsa.getKeyFromInput(a, b);
+		} else {
+			rsa.generatePrimes();
+		}
+		System.out.println("+++++++++++++++++++++++++++++++++++++");
+		rsa.printPrimes();
+		rsa.printKeys();
+		System.out.println("-------------------------------------");
+	}
+
+	private BigInteger readAsBigIntiger() {
+		BigInteger a;
+		try {
+			a = new BigInteger(scanner.nextLine().trim());
+		} catch (Exception e) {
+			a = BigInteger.ONE;
+		}
+		return a;
+	}
+
+	private void askForTask() {
+		System.out.println("*************************************");
+		System.out.println(
+				"Would you like to Encrypt or Decrypt?\n(Type \"decrypt\" then the number in the next line,\ntype \"encrypt\" then the number in the next line,\nevery other answer means quit)");
+	}
+
+	private void decryptMessage() {
+		System.out.println("Type the encrypted message as a number!");
+		String answer = getAnswer();
+		BigInteger encmsg = null;
+		boolean decryptable = true;
+		try {
+			encmsg = new BigInteger(answer);
+			if (MyMath.isGreaterOrEqual(encmsg, rsa.getPubliKeys()[0]) || MyMath.isLess(encmsg, BigInteger.TWO)) {
+				decryptable = false;
+			}
+		} catch (Exception e) {
+			decryptable = false;
+			System.out.println("This message cannot be decrypted!");
+		}
+		if (decryptable) {
+			System.out.println("The decrypted message is:");
+			System.out.println(rsa.decryptMessage(encmsg));
+		}
+	}
+
+	private void encryptMessage() {
+		System.out.println("Type the message as a number!");
+		String answer = getAnswer();
+		BigInteger msg = null;
+		boolean encryptable = true;
+		try {
+			msg = new BigInteger(answer);
+			if (MyMath.isGreaterOrEqual(msg, rsa.getPubliKeys()[0]) || MyMath.isLess(msg, BigInteger.TWO)) {
+				encryptable = false;
+			}
+		} catch (Exception e) {
+			encryptable = false;
+			System.out.println("This message cannot be encrypted!");
+		}
+		if (encryptable) {
+			System.out.println("The encrypted message is:");
+			System.out.println(rsa.encryptMessage(msg));
+		}
+	}
+}

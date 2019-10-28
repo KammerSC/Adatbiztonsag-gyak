@@ -1,0 +1,108 @@
+package david.borbely.view;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.math.BigInteger;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
+
+import david.borbely.mymath.MyMath;
+import david.borbely.rsa.RSA;
+
+public class View extends JFrame{
+	private final RSA rsa;
+	
+	JLabel messageLabel = new JLabel("Application message");
+	JLabel primePLabel = new JLabel("Prime P");
+	JLabel primeQLabel = new JLabel("Prime Q");
+	JTextField primePText = new JTextField(30);
+	JTextField primeQText = new JTextField(30);
+	JButton setPrimes = new JButton("Set Primes");
+	
+
+	public View(RSA rsa) {
+		this.rsa = rsa;
+	}
+	
+	public void setUp() {
+        setSize(500, 400);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocation(400, 400);
+        JPanel panel = new JPanel();    
+        placeComponents(panel);
+        add(panel);
+        setVisible(true);
+	}
+
+	private void placeComponents(JPanel panel) {
+        panel.setLayout(null);
+        placeMessageLabel(panel);
+        placePrimeP(panel);
+        placePrimeQ(panel);
+        placeSetPrimesButton(panel);
+        
+	}
+
+	private void placeMessageLabel(JPanel panel) {
+		messageLabel.setBounds(10, 20, 480, 20);
+		panel.add(messageLabel);
+	}
+
+
+	private void placePrimeP(JPanel panel) {
+        primePLabel.setBounds(10,50,80,25);
+        panel.add(primePLabel);
+        primePText.setBounds(70,50,165,25);
+        panel.add(primePText);
+	}
+	
+	private void placePrimeQ(JPanel panel) {
+        primeQLabel.setBounds(10,80,80,25);
+        panel.add(primeQLabel);
+        primeQText.setBounds(70,80,165,25);
+        panel.add(primeQText);
+	}
+	
+	private void placeSetPrimesButton(JPanel panel) {
+		setPrimes.setBounds(10, 110, 120, 25);
+        setPrimes.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            	String a = primePText.getText().trim();
+            	String b = primeQText.getText().trim();
+            	BigInteger p = parse(a);
+            	BigInteger q = parse(b);
+            	primePText.setText(p.toString());
+            	primeQText.setText(q.toString());
+            	
+            }
+        });
+        panel.add(setPrimes);
+	}
+	
+	private BigInteger parse(String str) {
+		BigInteger result = null;
+		try {
+			result = new BigInteger(str);
+			boolean prime = MyMath.isItPrime(result);
+			System.out.println(str + "  " + prime);
+			if(!prime) {
+				throw new Exception();
+			}
+			setMessage("");
+		} catch (Exception e) {
+			setMessage("\" "+ str + "\" is not a prime! Generating prime");
+			result = MyMath.generatePrime(rsa.getBitlength());
+		}
+		return result;
+	} 
+	
+	private void setMessage(String msg) {
+		messageLabel.setText(msg);
+	}
+}

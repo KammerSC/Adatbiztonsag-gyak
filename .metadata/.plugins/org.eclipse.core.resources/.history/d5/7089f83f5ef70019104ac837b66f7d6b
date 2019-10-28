@@ -1,0 +1,55 @@
+package david.borbely;
+
+
+
+import static david.borbely.mymath.MyMath.extendedEuclideanAlgorithm;
+import static david.borbely.mymath.MyMath.fastModularExponentiation;
+import static david.borbely.mymath.MyMath.randomBigInteger;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.math.BigInteger;
+import java.time.LocalDateTime;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+
+import david.borbely.rsa.RSA;
+import david.borbely.view.View;
+
+import static david.borbely.mymath.MyMath.isItPrime;
+
+public class App {
+
+	public static void main(String[] args) {
+		
+		BigInteger asd = new BigInteger("13");
+		System.out.println(asd + ", is prime? " + isItPrime(asd));
+		asd = new BigInteger("15");
+		System.out.println(asd + ", is prime? " + isItPrime(asd));
+		asd = new BigInteger("17");
+		System.out.println(asd + ", is prime? " + isItPrime(asd));
+		asd = new BigInteger("19");
+		System.out.println(asd + ", is prime? " + isItPrime(asd));
+		asd = new BigInteger("203");
+		System.out.println(asd + ", is prime? " + isItPrime(asd));
+		asd = new BigInteger("561");
+		System.out.println(asd + ", is prime? " + isItPrime(asd));
+		asd = new BigInteger("2147483647");
+		System.out.println(asd + ", is prime? " + isItPrime(asd));
+
+
+		
+//		RSA rsa = new RSA(64);
+//		
+//		InputStream inp = new ByteArrayInputStream("yes\n15\n403\nq".getBytes());
+//		View view = new View(inp, rsa);
+		
+//		InputStream inp = new ByteArrayInputStream("no\nq".getBytes());		
+//		View view = new View(System.in, rsa);
+//		view.start();
+	}
+}
+
+

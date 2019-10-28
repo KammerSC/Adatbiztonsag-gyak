@@ -8,6 +8,7 @@ import david.borbely.mymath.MyMath;
 import david.borbely.rsa.RSA;
 
 public class View {
+	private static final BigInteger TWO = new BigInteger("2");
 
 	private RSA rsa;
 	private Scanner scanner;
@@ -85,16 +86,17 @@ public class View {
 		boolean decryptable = true;
 		try {
 			encmsg = new BigInteger(answer);
-			if (MyMath.isGreaterOrEqual(encmsg, rsa.getPubliKeys()[0]) || MyMath.isLess(encmsg, BigInteger.TWO)) {
+			if (MyMath.isGreaterOrEqual(encmsg, rsa.getPubliKeys()[0]) || MyMath.isLess(encmsg, TWO)) {
 				decryptable = false;
 			}
 		} catch (Exception e) {
 			decryptable = false;
-			System.out.println("This message cannot be decrypted!");
 		}
 		if (decryptable) {
 			System.out.println("The decrypted message is:");
 			System.out.println(rsa.decryptMessage(encmsg));
+		}else {
+			System.out.println("This message cannot be decrypted!");
 		}
 	}
 
@@ -105,16 +107,18 @@ public class View {
 		boolean encryptable = true;
 		try {
 			msg = new BigInteger(answer);
-			if (MyMath.isGreaterOrEqual(msg, rsa.getPubliKeys()[0]) || MyMath.isLess(msg, BigInteger.TWO)) {
+			if (MyMath.isGreaterOrEqual(msg, rsa.getPubliKeys()[0]) || MyMath.isLess(msg, TWO)) {
 				encryptable = false;
 			}
 		} catch (Exception e) {
 			encryptable = false;
-			System.out.println("This message cannot be encrypted!");
 		}
 		if (encryptable) {
 			System.out.println("The encrypted message is:");
 			System.out.println(rsa.encryptMessage(msg));
+		}else {
+			System.out.println("This message cannot be encrypted!");
 		}
+		
 	}
 }

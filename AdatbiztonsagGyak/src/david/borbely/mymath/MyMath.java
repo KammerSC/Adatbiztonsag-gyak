@@ -6,14 +6,12 @@ import java.util.List;
 import java.util.Random;
 
 import static java.math.BigInteger.ZERO;
-import static david.borbely.mymath.MyMath.isItPrime;
-import static david.borbely.mymath.MyMath.randomBigInteger;
 import static java.math.BigInteger.ONE;
-import static java.math.BigInteger.TWO;
 
 public class MyMath {
-	private static BigInteger MINUS_ONE = new BigInteger("-1");
-	private static Random RANDOM = new Random();
+	private static final BigInteger MINUS_ONE = new BigInteger("-1");
+	private static final BigInteger TWO = new BigInteger("2");
+	private static final Random RANDOM = new Random();
 
 	public static BigInteger randomBigInteger(int maxBitLength) {
 		return new BigInteger(maxBitLength, RANDOM);

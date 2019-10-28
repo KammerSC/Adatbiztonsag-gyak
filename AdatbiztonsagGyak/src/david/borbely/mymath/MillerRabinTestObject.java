@@ -2,7 +2,6 @@ package david.borbely.mymath;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 
@@ -13,7 +12,7 @@ import static david.borbely.mymath.MyMath.fastModularExponentiation;
 
 public class MillerRabinTestObject {
 	private static final BigInteger ONE = BigInteger.ONE;
-	private static final BigInteger TWO = BigInteger.TWO;
+	private static final BigInteger TWO = new BigInteger("2");
 	private static final BigInteger THREE = new BigInteger("3");
 	private static final BigInteger FOUR = new BigInteger("4");
 
